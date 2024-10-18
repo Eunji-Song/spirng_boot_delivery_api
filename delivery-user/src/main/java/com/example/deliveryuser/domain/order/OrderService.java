@@ -34,16 +34,16 @@ public class OrderService {
      * 장바구니 값을 받은 후 Order Table에 데이터 복사
      */
     @Transactional
-    public Long saveOrder(Long cartId) {
+    public Long saveOrder(OrderDto.RequestOrder requestOrder) {
         // cartId 데이터가 존재하는지 확인하기
+        Long cartId = requestOrder.getCartId();
         Cart cart = cartRepository.findCartById(cartId);
         if (cart == null) {
             throw new NotFoundException("장바구니가 존재하지 않습니다.");
         }
         List<CartItem> cartItems = cart.getItems();
 
-        Order order = new Order(cart);
-
+        Order order = new Order(cart, requestOrder.getAddress());
 
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem cartItem : cartItems) {
@@ -53,7 +53,6 @@ public class OrderService {
             order.getItems().add(orderItem);
         }
 
-
         orderRepository.save(order);
 
         Long orderId = order.getId();
@@ -62,6 +61,7 @@ public class OrderService {
             // 장바구니 삭제
             cartRepository.delete(cartId, memberId);
         }
+
 
         return orderId;
     }

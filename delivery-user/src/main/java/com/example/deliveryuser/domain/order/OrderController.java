@@ -1,9 +1,11 @@
 package com.example.deliveryuser.domain.order;
 
+import com.example.deliverycore.embeded.Address;
 import com.example.deliverycore.entity.Order;
 import com.example.deliveryuser.common.response.ApiResponse;
 import com.example.deliveryuser.common.response.ApiResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +23,15 @@ public class OrderController {
      * 주문생성
      */
     @PostMapping("")
-    public ApiResult saveOrder(@RequestParam(required = true) Long cartId) {
+    // requestBody
+    public ApiResult saveOrder(@Valid @RequestBody OrderDto.RequestOrder requestOrder) {
+        log.info("dto : {}", requestOrder.toString());
+        Long cartId = requestOrder.getCartId();
         if (cartId == null || cartId < 1) {
             return ApiResponse.error("장바구니 id를 입력해주세요.");
         }
 
-        Long orderId = orderService.saveOrder(cartId);
+        Long orderId = orderService.saveOrder(requestOrder);
         return ApiResponse.success(orderId);
     }
 

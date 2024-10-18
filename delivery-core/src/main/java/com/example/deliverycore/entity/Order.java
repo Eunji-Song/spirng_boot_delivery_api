@@ -1,5 +1,6 @@
 package com.example.deliverycore.entity;
 
+import com.example.deliverycore.embeded.Address;
 import com.example.deliverycore.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,15 +41,19 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
-
     // 주문 금액 총액
     private int totalPrice;
 
-    public Order(Cart cart) {
+    // 주소
+    @Embedded
+    private Address address;
+
+    public Order(Cart cart, Address address) {
         this.member_id = cart.getMember().getId();
         this.store = cart.getStore();
         this.orderStatus = OrderStatus.PENDING;
         this.totalPrice = cart.getTotalPrice();
+        this.address = address;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
